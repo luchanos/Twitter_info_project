@@ -1,9 +1,6 @@
-import json
-import sqlite3
-import re
 from retry import retry
 import os
-from constants import FILEPATH as fp, FILEPATH_AF as fpaf, db as dbp, sql, log_conf as lpc, logpath as lp
+from constants import FILEPATH, FILEPATH_AF, db, sql, log_conf, logpath
 from db_tweet_tools import *
 from sqlite_contextman import *
 import configparser
@@ -11,11 +8,11 @@ from prettylogger import PrettyLogger
 import argparse
 
 ppath = os.getcwd()  # проверяем с какой директорией работает питон
-FILEPATH_AF = '{}{}'.format(ppath, fpaf)
-FILEPATH = '{}{}'.format(ppath, fp)
-db = '{}{}'.format(ppath, dbp)
-log_conf = '{}{}'.format(ppath, lpc)
-logpath = '{}{}'.format(ppath, lp)
+FILEPATH_AF = '{}{}'.format(ppath, FILEPATH_AF)
+FILEPATH = '{}{}'.format(ppath, FILEPATH)
+db = '{}{}'.format(ppath, db)
+log_conf = '{}{}'.format(ppath, log_conf)
+logpath = '{}{}'.format(ppath, logpath)
 
 """ Производим создание и настройку парсера"""
 parser = argparse.ArgumentParser(description='Twitter_info_project')
@@ -30,6 +27,11 @@ mainLogger = PrettyLogger(name='tweet_script_logger', logpath=logpath, conf=conf
 
 
 def main(retry_attempts, delay):
+    """ Главный метод программы. Декорирован retry на случай неудачных коннекшенов к БД
+    :param retry_attempts: количество попыток
+    :param delay: задержка между попытками
+    :return:
+    """
 
     @retry(tries=retry_attempts, delay=delay)
     def main_func():
@@ -50,5 +52,4 @@ if __name__ == '__main__':
         main(args.retry_attempts, args.delay)
         mainLogger.logger.info(msg='Work complete, my Lord!')
     except Exception as err:
-        print(err)
         mainLogger.logger.error(msg="Error!!! {}".format(err))
